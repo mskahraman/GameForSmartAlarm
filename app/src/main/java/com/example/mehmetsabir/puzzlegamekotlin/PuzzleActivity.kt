@@ -4,31 +4,94 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.constraint.solver.widgets.Helper
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewTreeObserver
 import android.view.WindowManager
 import android.widget.Button
-import android.widget.Toast
 import java.util.*
 import kotlin.collections.ArrayList
 
 class PuzzleActivity : AppCompatActivity() {
 
-    private var list: ArrayList<Int>? = null
-    private var level: String?= null
-    private var numberOfPicture: Int? = 0
-    private var bundle: Bundle? = null
-
+    private var list: java.util.ArrayList<Int>? = null
+    var level: String? = null
+    var numberOfPicture: Int? = 0
+    var bundle: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_puzzle)
         window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
-        init()
-        scramble()
-        setDimensions()
+        bundle = intent.extras
+            getS()
+            init()
+            scramble()
+            setDimensions()
+
+    }
+
+    private fun getS() {
+
+        level = bundle?.getString("level")
+        numberOfPicture = bundle?.getInt("numberOfPicture")
+
+    }
 
 
+    fun getResId(context: Context, level: String, randomNumber: Int): java.util.ArrayList<Int> {
+        val images: java.util.ArrayList<Int> = java.util.ArrayList<Int>();
+        for (i in 1..9) {
+            val randomDrawableIndexWithTwoDigits: String = String.format(Locale.ENGLISH, "%02d", randomNumber)
+            val indexWithTwoDigits: String = String.format(Locale.ENGLISH, "%02d", i)
+            images.add(
+                context.resources.getIdentifier(
+                    "ic_" + level + "_" +
+                            randomDrawableIndexWithTwoDigits + "_" +
+                            indexWithTwoDigits, "drawable", context.packageName
+                )
+            )
+        }
+        return images
+    }
+
+
+    fun display(context: Context) {
+        val buttons = java.util.ArrayList<Button>()
+        var button: Button
+//        level?.let {
+        list = getResId(context, "easy", 1);
+        for (i in PuzzleActivity.tileList?.indices!!) {
+            button = Button(context)
+
+            if (PuzzleActivity.tileList!![i] == "0")
+                button.setBackgroundResource(list!![0])
+            else if (PuzzleActivity.tileList!![i] == "1")
+                button.setBackgroundResource(list!![1])
+            else if (PuzzleActivity.tileList!![i] == "2")
+                button.setBackgroundResource(list!![2])
+            else if (PuzzleActivity.tileList!![i] == "3")
+                button.setBackgroundResource(list!![3])
+            else if (PuzzleActivity.tileList!![i] == "4")
+                button.setBackgroundResource(list!![4])
+            else if (PuzzleActivity.tileList!![i] == "5")
+                button.setBackgroundResource(list!![5])
+            else if (PuzzleActivity.tileList!![i] == "6")
+                button.setBackgroundResource(list!![6])
+            else if (PuzzleActivity.tileList!![i] == "7")
+                button.setBackgroundResource(list!![7])
+            else if (PuzzleActivity.tileList!![i] == "8")
+                button.setBackgroundResource(list!![8])
+
+
+            buttons.add(button)
+        }
+
+        PuzzleActivity.mGridView?.adapter = CustomAdapter(buttons,
+            PuzzleActivity.mColumnWidth,
+            PuzzleActivity.mColumnHeight
+        )
+        //  }
     }
 
     private fun init() {
@@ -75,60 +138,7 @@ class PuzzleActivity : AppCompatActivity() {
         })
     }
 
-    private fun display(context: Context) {
-        val buttons = ArrayList<Button>()
-        var button: Button
-        bundle = intent.extras
 
-        level = bundle!!.getString("level")
-        numberOfPicture = bundle?.getInt("numberOfPicture")
-        list = getResId(context, "medium", 3);
-
-        for (i in tileList?.indices!!) {
-            button = Button(context)
-
-            if (tileList!![i] == "0")
-                button.setBackgroundResource(list!!.get(0))
-            else if (tileList!![i] == "1")
-                button.setBackgroundResource(list!!.get(1))
-            else if (tileList!![i] == "2")
-                button.setBackgroundResource(list!!.get(2))
-            else if (tileList!![i] == "3")
-                button.setBackgroundResource(list!!.get(3))
-            else if (tileList!![i] == "4")
-                button.setBackgroundResource(list!!.get(4))
-            else if (tileList!![i] == "5")
-                button.setBackgroundResource(list!!.get(5))
-            else if (tileList!![i] == "6")
-                button.setBackgroundResource(list!!.get(6))
-            else if (tileList!![i] == "7")
-                button.setBackgroundResource(list!!.get(7))
-            else if (tileList!![i] == "8")
-                button.setBackgroundResource(list!!.get(8))
-
-
-            buttons.add(button)
-        }
-
-        mGridView?.adapter = CustomAdapter(buttons, mColumnWidth, mColumnHeight)
-    }
-
-
-    fun getResId(context: Context, level: String, randomNumber: Int): ArrayList<Int> {
-        val images: ArrayList<Int> = ArrayList<Int>();
-        for (i in 1..9) {
-            val randomDrawableIndexWithTwoDigits: String = String.format(Locale.ENGLISH, "%02d", randomNumber)
-            val indexWithTwoDigits: String = String.format(Locale.ENGLISH, "%02d", i)
-            images.add(
-                context.resources.getIdentifier(
-                    "ic_" + level + "_" +
-                            randomDrawableIndexWithTwoDigits + "_" +
-                            indexWithTwoDigits, "drawable", context.packageName
-                )
-            )
-        }
-        return images
-    }
 
 
     private fun getStatusBarHeight(context: Context): Int {
@@ -163,122 +173,15 @@ class PuzzleActivity : AppCompatActivity() {
 
     companion object {
 
-        private val COLUMNS = 3
-        private val DIMENSIONS = 3 * COLUMNS
+        val COLUMNS = 3
+        val DIMENSIONS = 3 * COLUMNS
         const val up = "up"
         const val down = "down"
         const val left = "left"
         const val right = "right"
-        private var tileList: Array<String?>? = null
-        private var mGridView: GestureDetectGridView? = null
-        private var mColumnWidth: Int = 0
-        private var mColumnHeight: Int = 0
-
-        fun swap(context: Context, currentPosition: Int, swap: Int) {
-            val newPosition = tileList!![currentPosition + swap]
-            tileList!![currentPosition + swap] = tileList!![currentPosition]
-            tileList!![currentPosition] = newPosition
-            PuzzleActivity().display(context)
-
-            if (PuzzleActivity().isSolved()) Toast.makeText(context, "YOU WIN!", Toast.LENGTH_SHORT).show()
-        }
-
-        fun moveTiles(context: Context, direction: String, position: Int) {
-
-            // Upper-left-corner tile
-            if (position == 0) {
-
-                if (direction == right)
-                    swap(context, position, 1)
-                else if (direction == down)
-                    swap(context, position, COLUMNS)
-                else
-                    Toast.makeText(context, "Invalid move", Toast.LENGTH_SHORT).show()
-
-                // Upper-center tiles
-            } else if (position > 0 && position < COLUMNS - 1) {
-                if (direction == left)
-                    swap(context, position, -1)
-                else if (direction == down)
-                    swap(context, position, COLUMNS)
-                else if (direction == right)
-                    swap(context, position, 1)
-                else
-                    Toast.makeText(context, "Invalid move", Toast.LENGTH_SHORT).show()
-
-                // Upper-right-corner tile
-            } else if (position == COLUMNS - 1) {
-                if (direction == left)
-                    swap(context, position, -1)
-                else if (direction == down)
-                    swap(context, position, COLUMNS)
-                else
-                    Toast.makeText(context, "Invalid move", Toast.LENGTH_SHORT).show()
-
-                // Left-side tiles
-            } else if (position > COLUMNS - 1 && position < DIMENSIONS - COLUMNS &&
-                position % COLUMNS == 0
-            ) {
-                if (direction == up)
-                    swap(context, position, -COLUMNS)
-                else if (direction == right)
-                    swap(context, position, 1)
-                else if (direction == down)
-                    swap(context, position, COLUMNS)
-                else
-                    Toast.makeText(context, "Invalid move", Toast.LENGTH_SHORT).show()
-
-                // Right-side AND bottom-right-corner tiles
-            } else if (position == COLUMNS * 2 - 1 || position == COLUMNS * 3 - 1) {
-                if (direction == up)
-                    swap(context, position, -COLUMNS)
-                else if (direction == left)
-                    swap(context, position, -1)
-                else if (direction == down) {
-
-                    // Tolerates only the right-side tiles to swap downwards as opposed to the bottom-
-                    // right-corner tile.
-                    if (position <= DIMENSIONS - COLUMNS - 1)
-                        swap(
-                            context, position,
-                            COLUMNS
-                        )
-                    else
-                        Toast.makeText(context, "Invalid move", Toast.LENGTH_SHORT).show()
-                } else
-                    Toast.makeText(context, "Invalid move", Toast.LENGTH_SHORT).show()
-
-                // Bottom-left corner tile
-            } else if (position == DIMENSIONS - COLUMNS) {
-                if (direction == up)
-                    swap(context, position, -COLUMNS)
-                else if (direction == right)
-                    swap(context, position, 1)
-                else
-                    Toast.makeText(context, "Invalid move", Toast.LENGTH_SHORT).show()
-
-                // Bottom-center tiles
-            } else if (position < DIMENSIONS - 1 && position > DIMENSIONS - COLUMNS) {
-                if (direction == up)
-                    swap(context, position, -COLUMNS)
-                else if (direction == left)
-                    swap(context, position, -1)
-                else if (direction == right)
-                    swap(context, position, 1)
-                else
-                    Toast.makeText(context, "Invalid move", Toast.LENGTH_SHORT).show()
-
-                // Center tiles
-            } else {
-                if (direction == up)
-                    swap(context, position, -COLUMNS)
-                else if (direction == left)
-                    swap(context, position, -1)
-                else if (direction == right)
-                    swap(context, position, 1)
-                else
-                    swap(context, position, COLUMNS)
-            }
-        }
+        var tileList: Array<String?>? = null
+        var mGridView: GestureDetectGridView? = null
+        var mColumnWidth: Int = 0
+        var mColumnHeight: Int = 0
     }
 }

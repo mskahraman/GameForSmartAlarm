@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
 import android.support.annotation.RequiresApi
+import android.support.constraint.solver.widgets.Helper
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -59,18 +60,18 @@ class GestureDetectGridView : GridView {
                         return false
                     }
                     if (e1.y - e2.y > SWIPE_MIN_DISTANCE) {
-                        PuzzleActivity.moveTiles(context, PuzzleActivity.up, position)
+                        HelperPuzzle.instance.moveTiles(context, PuzzleActivity.up, position)
                     } else if (e2.y - e1.y > SWIPE_MIN_DISTANCE) {
-                        PuzzleActivity.moveTiles(context, PuzzleActivity.down, position)
+                        HelperPuzzle.instance.moveTiles(context, PuzzleActivity.down, position)
                     }
                 } else {
                     if (Math.abs(velocityX) < SWIPE_THRESHOLD_VELOCITY) {
                         return false
                     }
                     if (e1.x - e2.x > SWIPE_MIN_DISTANCE) {
-                        PuzzleActivity.moveTiles(context, PuzzleActivity.left, position)
+                        HelperPuzzle.instance.moveTiles(context, PuzzleActivity.left, position)
                     } else if (e2.x - e1.x > SWIPE_MIN_DISTANCE) {
-                        PuzzleActivity.moveTiles(context, PuzzleActivity.right, position)
+                       HelperPuzzle.instance.moveTiles(context, PuzzleActivity.right, position)
                     }
                 }
 
