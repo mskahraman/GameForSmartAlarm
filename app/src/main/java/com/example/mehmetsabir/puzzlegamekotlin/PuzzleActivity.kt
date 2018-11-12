@@ -6,20 +6,29 @@ import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewTreeObserver
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
 import java.util.*
+import kotlin.collections.ArrayList
 
 class PuzzleActivity : AppCompatActivity() {
 
+    private var list: ArrayList<Int>? = null
+    private var level: String?= null
+    private var numberOfPicture: Int? = 0
+    private var bundle: Bundle? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_puzzle)
+        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         init()
         scramble()
         setDimensions()
+
+
     }
 
     private fun init() {
@@ -31,7 +40,6 @@ class PuzzleActivity : AppCompatActivity() {
             tileList!![i] = i.toString()
         }
     }
-
 
     private fun scramble() {
         var index: Int
@@ -47,6 +55,8 @@ class PuzzleActivity : AppCompatActivity() {
     }
 
     private fun setDimensions() {
+
+
         val vto = mGridView?.getViewTreeObserver()
         vto?.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -68,33 +78,56 @@ class PuzzleActivity : AppCompatActivity() {
     private fun display(context: Context) {
         val buttons = ArrayList<Button>()
         var button: Button
+        bundle = intent.extras
+
+        level = bundle!!.getString("level")
+        numberOfPicture = bundle?.getInt("numberOfPicture")
+        list = getResId(context, "medium", 3);
 
         for (i in tileList?.indices!!) {
             button = Button(context)
 
             if (tileList!![i] == "0")
-                button.setBackgroundResource(R.drawable.pigeon_piece1)
+                button.setBackgroundResource(list!!.get(0))
             else if (tileList!![i] == "1")
-                button.setBackgroundResource(R.drawable.pigeon_piece2)
+                button.setBackgroundResource(list!!.get(1))
             else if (tileList!![i] == "2")
-                button.setBackgroundResource(R.drawable.pigeon_piece3)
+                button.setBackgroundResource(list!!.get(2))
             else if (tileList!![i] == "3")
-                button.setBackgroundResource(R.drawable.pigeon_piece4)
+                button.setBackgroundResource(list!!.get(3))
             else if (tileList!![i] == "4")
-                button.setBackgroundResource(R.drawable.pigeon_piece5)
+                button.setBackgroundResource(list!!.get(4))
             else if (tileList!![i] == "5")
-                button.setBackgroundResource(R.drawable.pigeon_piece6)
+                button.setBackgroundResource(list!!.get(5))
             else if (tileList!![i] == "6")
-                button.setBackgroundResource(R.drawable.pigeon_piece7)
+                button.setBackgroundResource(list!!.get(6))
             else if (tileList!![i] == "7")
-                button.setBackgroundResource(R.drawable.pigeon_piece8)
+                button.setBackgroundResource(list!!.get(7))
             else if (tileList!![i] == "8")
-                button.setBackgroundResource(R.drawable.pigeon_piece9)
+                button.setBackgroundResource(list!!.get(8))
+
 
             buttons.add(button)
         }
 
         mGridView?.adapter = CustomAdapter(buttons, mColumnWidth, mColumnHeight)
+    }
+
+
+    fun getResId(context: Context, level: String, randomNumber: Int): ArrayList<Int> {
+        val images: ArrayList<Int> = ArrayList<Int>();
+        for (i in 1..9) {
+            val randomDrawableIndexWithTwoDigits: String = String.format(Locale.ENGLISH, "%02d", randomNumber)
+            val indexWithTwoDigits: String = String.format(Locale.ENGLISH, "%02d", i)
+            images.add(
+                context.resources.getIdentifier(
+                    "ic_" + level + "_" +
+                            randomDrawableIndexWithTwoDigits + "_" +
+                            indexWithTwoDigits, "drawable", context.packageName
+                )
+            )
+        }
+        return images
     }
 
 
@@ -131,7 +164,7 @@ class PuzzleActivity : AppCompatActivity() {
     companion object {
 
         private val COLUMNS = 3
-        private val DIMENSIONS = COLUMNS * COLUMNS
+        private val DIMENSIONS = 3 * COLUMNS
         const val up = "up"
         const val down = "down"
         const val left = "left"

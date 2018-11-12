@@ -18,7 +18,6 @@ class GestureDetectGridView : GridView {
     private val SWIPE_MIN_DISTANCE = 100
     private val SWIPE_MAX_OFF_PATH = 100
     private val SWIPE_THRESHOLD_VELOCITY = 100
-    private val puzzleActivity: PuzzleActivity? = null
 
     constructor(context: Context) : super(context) {
         init(context)
